@@ -33,7 +33,7 @@ class HeaderTest(test.TestCase):
   def test_header(self):
     """Test python header."""
     suffix = ["*.py", "*.cc"]
-    folders = ["./", "../python/epl", "../python/setup.py", "../cc"]
+    folders = ["./", "../epl", "../setup.py", "../csrc"]
     for folder in folders:
       for sf in suffix:
         for path in Path(folder).rglob(sf):

@@ -6,7 +6,7 @@ unset LD_PRELOAD
 if [[ -z "${PYTHON}" ]]; then
     export PYTHON=$(which python)
 fi
-export PYTHONPATH=../python/:${PYTHONPATH}
+export PYTHONPATH=../:${PYTHONPATH}
 
 export NET_DEVICE=$(find /sys/class/net/ -name 'bond0' -o -name 'eth*' | cut -d '/' -f5- | sort | head -1)
 

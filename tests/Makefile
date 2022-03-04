@@ -8,7 +8,7 @@ GPU_8 = 0,1,2,3,4,5,6,7
 
 .PHONY: test
 test:
-	PYTHONPATH=../python/ python -m epl.utils.launcher --num_workers=2 --gpu_per_worker=1 --debug=True test_launcher.sh
+	PYTHONPATH=../ $(PYTHON) -m epl.utils.launcher --num_workers=2 --gpu_per_worker=1 --debug=True test_launcher.sh
 	CUDA_VISIBLE_DEVICES='' ./launch.sh header_test.py
 	CUDA_VISIBLE_DEVICES=$(GPU_4) ./launch.sh strategy_new_test.py
 	CUDA_VISIBLE_DEVICES=$(GPU_4) ./launch.sh auto_cluster_test.py

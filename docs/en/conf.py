@@ -21,7 +21,7 @@ copyright = u'2021, Alibaba-inc'
 author = u'Alibaba-inc'
 
 from importlib.machinery import SourceFileLoader
-version = SourceFileLoader("epl.version", "../../python/epl/utils/version.py") \
+version = SourceFileLoader("epl.version", "../../epl/utils/version.py") \
     .load_module().VERSION
 
 # -- General configuration ---------------------------------------------------
