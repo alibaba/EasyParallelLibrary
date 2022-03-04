@@ -12,20 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Script to generate ldflags."""
+"""Script to generate cflags."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf
 import os
+import tensorflow as tf
+
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 
-if hasattr(tf.sysconfig, "get_link_flags"):
-  ldflags = tf.sysconfig.get_link_flags()
+if hasattr(tf.sysconfig, "get_compile_flags"):
+  cflags = tf.sysconfig.get_compile_flags()
 else:
-  tf_lib = os.path.dirname(tf.__file__)
-  ldflags = ['-L{}'.format(tf_lib), '-ltensorflow_framework']
+  tf_include = os.path.join(os.path.dirname(tf.__file__), "include")
+  cflags = [
+      '-I{}'.format(tf_include),
+      '-I{}/external/nsync/public/'.format(tf_include)]
 
-print(' '.join(ldflags))
+print(' '.join(cflags))

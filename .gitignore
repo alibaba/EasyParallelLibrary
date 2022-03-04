@@ -1,0 +1,17 @@
+.idea
+.DS_Store
+*.pyc
+*.so
+built/
+dist/
+*.egg-info/
+*.pbtxt
+events.out.tfevents.*
+model.ckpt*
+checkpoint
+*.tfrecords
+*.log
+.vscode/
+*.py.swp
+*.cc.d
+*.o

@@ -29,28 +29,22 @@ from distutils.command.build import build as DistutilsBuild
 
 from setuptools import find_packages
 from setuptools import setup
-from setuptools.dist import Distribution
 
 
 
 if sys.version_info[0] < 3:
   import imp
-  VERSION = imp.load_source('epl.version', 'python/epl/utils/version.py').VERSION
+  VERSION = imp.load_source('epl.version', 'epl/utils/version.py').VERSION
 else:
   from importlib.machinery import SourceFileLoader
-  VERSION = SourceFileLoader("epl.version", "python/epl/utils/version.py") \
+  VERSION = SourceFileLoader("epl.version", "epl/utils/version.py") \
       .load_module().VERSION
 
-PACKAGES = find_packages("python", exclude=['.*test'])
+PACKAGES = find_packages("epl", exclude=['.*test'])
 PACKAGE_DATA = {'': ['*.so']}
 cwd = os.path.dirname(os.path.abspath(__file__))
-cc_path = os.path.join(cwd, "cc")
+cc_path = os.path.join(cwd, "csrc")
 
-
-class BinaryDistribution(Distribution):
-  """This class is needed in order to create OS specific wheels."""
-  def has_ext_modules(self):
-    return True
 
 def build_clean():
   """build clean."""
@@ -81,13 +75,12 @@ class EplClean(DistutilsCommand):
     build_clean()
 
 setup(
-    name='epl',
+    name='pyepl',
     version=VERSION,
     packages=PACKAGES,
     include_package_data=True,
     package_data=PACKAGE_DATA,
-    package_dir={"": "python"},
-    distclass=BinaryDistribution,
+    package_dir={"": "epl"},
     entry_points={
         "console_scripts": [
             "epl-launch=epl.utils.launcher:main",
@@ -96,32 +89,28 @@ setup(
     cmdclass={'build': EplBuild, 'clean': EplClean},
     zip_safe=False,
     author='Alibaba Inc.',
-    url='https://yuque.antfin-inc.com/pai-user/manual/intro',
+    url='https://easyparallellibrary.readthedocs.io/en/latest/',
     description=('Easy Parallel Library(EPL) powered by Alibaba.'),
     keywords=['distributed training', 'machine learning', 'tensorflow'],
     extras_require={
         ':python_version == "2.7"': [
-            'pandas==0.24.2',
+            'pandas',
             'matplotlib==2.0.0'
         ],
         ':python_version >= "3.4"': [
-            'pandas==1.1.5',
+            'pandas',
             'matplotlib==3.3.4',
             'toposort'
         ],
     },
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Education',
-        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.8',
         'Operating System :: POSIX :: Linux',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Software Development :: Libraries',
+        'Operating System :: OS Independent',
     ],
     license='Apache 2.0',
 )

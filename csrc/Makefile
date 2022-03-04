@@ -15,7 +15,7 @@ CFLAGS := -O3 -g -DNDEBUG \
 	-I$(PAI_HOME)/include \
 	-I. \
 	-I./tensorflow_include/ \
-	$(shell $(PYTHON) tools/tf_cflags.py 2>/dev/null)
+	$(shell $(PYTHON) ../epl/utils/tf_cflags.py 2>/dev/null)
 
 CXX_CFLAGS := \
 	-std=c++11 \
@@ -33,7 +33,7 @@ LDFLAGS := -shared \
 	-fstack-protector \
 	-L$(PAI_HOME)/lib \
 	-Wl,-rpath='$$ORIGIN:$$ORIGIN/../../tensorflow' \
-	$(shell $(PYTHON) tools/tf_ldflags.py 2>/dev/null)
+	$(shell $(PYTHON) ../epl/utils/tf_ldflags.py 2>/dev/null)
 
 ifeq ($(TFCOLL_WITH_CUDA),ON)
 NVCC ?= nvcc
@@ -96,7 +96,7 @@ DEPS := $(shell \
 
 -include $(DEPS)
 
-LIB := ../python/epl/communicators/libcommunicators.so
+LIB := ../epl/communicators/libcommunicators.so
 $(LIB):
 ifeq ($(TFCOLL_WITH_CUDA),ON)
 $(LIB): $(OBJS) $(CU_OBJS)

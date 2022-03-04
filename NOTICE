@@ -9,7 +9,7 @@ TensorFlow's Apache License
 This repo contains code derived from TensorFlow, which was previously licensed 
 under Apache License Version 2.0:
 -------------------------------------------
-python/epl/communicators/collective_keys.py
+epl/communicators/collective_keys.py
 
                                  Apache License
                            Version 2.0, January 2004
@@ -221,7 +221,7 @@ gradient-checkpointing's MIT License
 This repo contains code derived from gradient-checkpointing, which was previously licensed 
 under MIT License:
 --------------------------------------------
-python/epl/runtime/gc/gradient_checkpoint.py
+epl/runtime/gc/gradient_checkpoint.py
 
 The MIT License
 
