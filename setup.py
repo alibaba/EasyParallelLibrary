@@ -40,7 +40,7 @@ else:
   VERSION = SourceFileLoader("epl.version", "epl/utils/version.py") \
       .load_module().VERSION
 
-PACKAGES = find_packages("epl", exclude=['.*test'])
+PACKAGES = find_packages(exclude=["build", "csrc", "dist", "docs", "tests", "examples"])
 PACKAGE_DATA = {'': ['*.so']}
 cwd = os.path.dirname(os.path.abspath(__file__))
 cc_path = os.path.join(cwd, "csrc")
@@ -80,7 +80,7 @@ setup(
     packages=PACKAGES,
     include_package_data=True,
     package_data=PACKAGE_DATA,
-    package_dir={"": "epl"},
+    package_dir={"": "./"},
     entry_points={
         "console_scripts": [
             "epl-launch=epl.utils.launcher:main",
