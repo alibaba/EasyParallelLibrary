@@ -13,9 +13,9 @@ Easy Parallel Library (EPL) is a general and efficient deep learning framework f
 - Memory Efficient - EPL provides various memory-saving techniques, including gradient checkpoint, ZERO, CPU Offload, etc. Users are able to train larger models with fewer computing resources.
 - High Performance - EPL provides an optimized communication library to achieve high scalability and efficiency.
 
-[**Documentation**](https://easyparallellibrary.readthedocs.io/en/latest/)
+For more information, you may [read the docs](https://easyparallellibrary.readthedocs.io/en/latest/).
 
-[**Model Zoo**](https://github.com/alibaba/FastNN)
+EPL [Model Zoo](https://github.com/alibaba/FastNN) provides end-to-end parallel training examples.
 
 ## Installation
 

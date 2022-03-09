@@ -17,9 +17,8 @@ EPL深度集成了各种训练优化技术，帮助更多的用户低成本，�
 
 EPL助力了最大的中文多模态模型M6实现大规模分布式训练，通过512卡即可训练10万亿参数模型。
 
-[**Documentation**](https://easyparallellibrary.readthedocs.io/zh/latest/)
+您可以阅读[**文档**](https://easyparallellibrary.readthedocs.io/zh/latest/) 了解更多信息。EPL [**Model Zoo**](https://github.com/alibaba/FastNN) 提供了完整的分布式训练案例。
 
-[**Model Zoo**](https://github.com/alibaba/FastNN)
 
 ## 使用EPL添加分布式策略
 
