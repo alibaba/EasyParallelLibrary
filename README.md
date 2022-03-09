@@ -1,3 +1,9 @@
+[![pypi](https://img.shields.io/pypi/v/pyepl.svg)](https://pypi.org/project/pyepl)
+[![docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://easyparallellibrary.readthedocs.io/en/latest/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/alibaba/EasyParallelLibrary/blob/main/LICENSE)
+
+English | [简体中文](README_cn.md)
+
 # Easy Parallel Library
 
 ## Overview
@@ -6,6 +12,9 @@ Easy Parallel Library (EPL) is a general and efficient deep learning framework f
 - Usability - Users can implement different parallelism strategies with a few lines of annotations, including data parallelism, pipeline parallelism, tensor model parallelism, and their hybrids. 
 - Memory Efficient - EPL provides various memory-saving techniques, including gradient checkpoint, ZERO, CPU Offload, etc. Users are able to train larger models with fewer computing resources.
 - High Performance - EPL provides an optimized communication library to achieve high scalability and efficiency.
+
+[**Documentation**](https://easyparallellibrary.readthedocs.io/en/latest/)
+[**Model Zoo**](https://github.com/alibaba/FastNN)
 
 ## Installation
 
