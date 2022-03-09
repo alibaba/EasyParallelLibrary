@@ -18,12 +18,13 @@ EPL深度集成了各种训练优化技术，帮助更多的用户低成本，�
 EPL助力了最大的中文多模态模型M6实现大规模分布式训练，通过512卡即可训练10万亿参数模型。
 
 [**Documentation**](https://easyparallellibrary.readthedocs.io/zh/latest/)
+
 [**Model Zoo**](https://github.com/alibaba/FastNN)
 
 ## 使用EPL添加分布式策略
 
-通过添加几行代码，用户即可实现不同的并行化策略。完整的API介绍和并行化例子详见[API](api/index.rst)。
-你也可以参考[使用教程](tutorials/index.rst) 来训练EPL模型库例子。
+通过添加几行代码，用户即可实现不同的并行化策略。完整的API介绍和并行化例子详见[API](https://easyparallellibrary.readthedocs.io/zh/latest/api/index.html)。
+你也可以参考[使用教程](https://easyparallellibrary.readthedocs.io/zh/latest/tutorials/index.html) 来训练EPL模型库例子。
 
 数据并行
 ```diff
@@ -77,4 +78,4 @@ EPL助力了最大的中文多模态模型M6实现大规模分布式训练，通
 
 欢迎给我们提issue, 或者加入EPL官方钉钉群。
 
-![DingTalk Group](../images/ding-group.png)
+![DingTalk Group](docs/images/ding-group.png)

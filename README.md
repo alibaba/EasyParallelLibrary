@@ -14,16 +14,17 @@ Easy Parallel Library (EPL) is a general and efficient deep learning framework f
 - High Performance - EPL provides an optimized communication library to achieve high scalability and efficiency.
 
 [**Documentation**](https://easyparallellibrary.readthedocs.io/en/latest/)
+
 [**Model Zoo**](https://github.com/alibaba/FastNN)
 
 ## Installation
 
-To install EPL, please refer to the following [instructions](docs/en/installation_instructions.md).
+To install EPL, please refer to the following [instructions](https://easyparallellibrary.readthedocs.io/en/latest/installation_instructions.html).
 
 ## Examples
 
 Here are a few examples of different parallelism strategies by changing only annotations.
-Please refer to the full [documentation](https://easyparallellibrary.readthedocs.io/en/latest/) for more examples.
+Please refer to [API documentation](https://easyparallellibrary.readthedocs.io/en/latest/api/index.html) for API details and [tutorials](https://easyparallellibrary.readthedocs.io/en/latest/tutorials/index.html) for more examples.
 
 ### Data Parallelism
 
