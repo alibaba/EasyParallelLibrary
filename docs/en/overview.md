@@ -11,7 +11,7 @@ Easy Parallel Library (EPL) is a general and efficient deep learning framework f
 ## Examples
 
 Here are a few examples of different parallelism strategies by changing only annotations.
-Please refer to the full [tutorials](tutorials/index.rst) for more examples.
+Please refer to [API documentation](api/index.rst) for API details and [tutorials](tutorials/index.rst) for more examples.
 
 ### Data Parallelism
 
@@ -71,3 +71,9 @@ If you use EPL in your publication, please cite it by using the following BibTeX
       primaryClass={cs.DC}
 }
 ```
+
+## Contact Us
+
+Feel free to open an issue, or join the Official Discussion Group on DingTalk.
+
+![DingTalk Group](../images/ding-group.png)

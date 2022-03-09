@@ -74,3 +74,9 @@ If you use EPL in your publication, please cite it by using the following BibTeX
       primaryClass={cs.DC}
 }
 ```
+
+## Contact Us
+
+Join the Official Discussion Group on DingTalk.
+
+![DingTalk Group](docs/images/ding-group.png)

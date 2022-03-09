@@ -16,7 +16,7 @@ Easy Parallel Library (EPL) is a general and efficient deep learning framework f
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Documentation
+   :caption: API
 
    api/strategy
    api/api_examples
@@ -27,10 +27,12 @@ Easy Parallel Library (EPL) is a general and efficient deep learning framework f
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Tutorials
 
-   tutorials/index
+   tutorials/ddp
+   tutorials/pipe
+   tutorials/moe
 
 |
 |
