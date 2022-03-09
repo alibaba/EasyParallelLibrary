@@ -16,7 +16,7 @@ EPL (Easy Parallel Library) 是一个高效易用的分布式大模型训练框�
 
 .. toctree::
    :maxdepth: 2
-   :caption: API 文档
+   :caption: API
 
    api/strategy
    api/api_examples
@@ -26,10 +26,12 @@ EPL (Easy Parallel Library) 是一个高效易用的分布式大模型训练框�
 |
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: 使用教程
 
-   tutorials/index
+   tutorials/ddp
+   tutorials/pipe
+   tutorials/moe
 
 |
 |

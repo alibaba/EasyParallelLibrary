@@ -1,13 +1,13 @@
-使用教程
+API 文档
 =======================
 
 .. toctree::
    :maxdepth: 1
    :caption: 目录
 
-   ddp
-   pipe
-   moe
+   strategy
+   api_examples
+   config
 
 |
 |
