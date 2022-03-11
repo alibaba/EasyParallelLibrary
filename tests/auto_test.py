@@ -99,25 +99,49 @@ class AutoTest(test.TestCase):
         layer_names = set([name.split('/')[3].split('_')[1] for name in names if 'layer' in name])
         stage2layers[tg.index] = layer_names
       sess.run(train_op)
-    return stage2layers
+    return stage2layers, taskgraphs
 
   def test_auto_pipeline_repeated(self):
     config = epl.Config({"pipeline.num_micro_batch": 4,
                          "pipeline.num_stages": 4,
                          "auto.auto_parallel": True})
     epl.init(config)
-    stage2layers = self._auto_pipeline_repeated(8)
+    stage2layers, taskgraphs = self._auto_pipeline_repeated(8)
     self.assertEqual(len(stage2layers), 4)
     self.assertEqual(stage2layers, {0: {'layer0', 'layer1'}, 1: {'layer3', 'layer2'}, 2: {'layer5', 'layer4'}, 3: {'layer6', 'layer7'}})
+    for i in range(4):
+      device = '/job:worker/replica:0/task:0/device:GPU:{}'.format(i)
+      self.assertEqual(taskgraphs[i].virtual_device.get_device(0, 0), device)
+      self.assertEqual(taskgraphs[i].operations.forward_operations(0, 0)[-1].device, device)
 
   def test_auto_pipeline_repeated2(self):
     config = epl.Config({"pipeline.num_micro_batch": 4,
                          "pipeline.num_stages": 4,
                          "auto.auto_parallel": True})
     epl.init(config)
-    stage2layers = self._auto_pipeline_repeated(6)
+    stage2layers, taskgraphs = self._auto_pipeline_repeated(6)
     self.assertEqual(len(stage2layers), 4)
     self.assertEqual(stage2layers, {0: {'layer0', 'layer1'}, 1: {'layer1', 'layer2', 'layer3'}, 2: {'layer3', 'layer4'}, 3: {'layer4', 'layer5'}})
+    for i in range(4):
+      device = '/job:worker/replica:0/task:0/device:GPU:{}'.format(i)
+      self.assertEqual(taskgraphs[i].virtual_device.get_device(0, 0), device)
+      self.assertEqual(taskgraphs[i].operations.forward_operations(0, 0)[-1].device, device)
+
+  def test_auto_pipeline_repeated3(self):
+    config = epl.Config({"pipeline.num_micro_batch": 4,
+                         "pipeline.num_stages": 4,
+                         "auto.auto_parallel": True})
+    epl.init(config)
+    stage2layers, taskgraphs = self._auto_pipeline_repeated(12)
+    self.assertEqual(len(stage2layers), 4)
+    self.assertEqual(stage2layers, {0: {'layer0', 'layer1', 'layer2'},
+                                    1: {'layer3', 'layer4', 'layer5'},
+                                    2: {'layer6', 'layer7', 'layer8'},
+                                    3: {'layer9', 'layer10', 'layer11'}})
+    for i in range(4):
+      device = '/job:worker/replica:0/task:0/device:GPU:{}'.format(i)
+      self.assertEqual(taskgraphs[i].virtual_device.get_device(0, 0), device)
+      self.assertEqual(taskgraphs[i].operations.forward_operations(0, 0)[-1].device, device)
 
 
 # pylint: enable=missing-docstring,unused-variable
