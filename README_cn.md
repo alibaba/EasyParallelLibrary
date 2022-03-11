@@ -6,7 +6,7 @@
 
 # 概览
 
-Easy Parallel Library (EPL) 是一个高效易用的分布式大模型训练框架。
+Easy Parallel Library (EPL) 是一个高效易用的分布式模型训练框架。
 EPL提供了简单易用的API来表达各种并行化策略，
 用户仅需几行代码就可以轻松支持各种模型的高性能分布式训练。
 
