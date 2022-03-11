@@ -279,6 +279,8 @@ class GraphEditor(object):
         self._graph.strategy_context.del_context(strategy)
     # Remove old taskgraph.
     del self._graph.taskgraphs[0]
+    # Remove temp virtual device
+    del virtual_devices[0]
     assert self._graph.num_stages == len(stage_ops), \
         "Taskgraph number {} is not equal to number of auto stage_ops {}" \
         .format(self._graph.num_stages, len(stage_ops))

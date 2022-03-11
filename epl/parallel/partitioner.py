@@ -21,6 +21,7 @@ from __future__ import print_function
 from collections import Counter
 from collections import defaultdict
 from tensorflow.python.platform import tf_logging
+from epl.ir.graph import Graph
 
 def partition_buckets(weights, bucket_size, num_stages):
   """partition weights to buckets given bucket_size"""
@@ -115,8 +116,8 @@ def find_repeated_blocks(operations, max_depth=20, min_dup=4, min_ops=20):
           visited_scopes.add(scope)
           tf_logging.info("Find scope {}, block op number: {}" \
                       .format(scope, len(block)))
-  # sort by op name
-  candidates = sorted(candidates, key=lambda blocks: blocks[0].name)
+  # sort by op index
+  candidates = sorted(candidates, key=lambda blocks: Graph.get().map_op_name_to_sequence[blocks[0].name])
   return candidates
 
 
