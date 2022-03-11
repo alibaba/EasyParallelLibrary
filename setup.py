@@ -30,6 +30,14 @@ from distutils.command.build import build as DistutilsBuild
 from setuptools import find_packages
 from setuptools import setup
 
+import tensorflow as tf
+
+
+def get_tf_version():
+  """Get tf version."""
+  tf_version = tf.__version__
+  tf_version = '.'.join(tf_version.split('.')[:2])
+  return tf_version
 
 
 if sys.version_info[0] < 3:
@@ -40,6 +48,7 @@ else:
   VERSION = SourceFileLoader("epl.version", "epl/utils/version.py") \
       .load_module().VERSION
 
+VERSION = VERSION + "+" + get_tf_version()
 PACKAGES = find_packages(exclude=["build", "csrc", "dist", "docs", "tests", "examples"])
 PACKAGE_DATA = {'': ['*.so']}
 cwd = os.path.dirname(os.path.abspath(__file__))
