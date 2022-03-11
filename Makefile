@@ -3,7 +3,7 @@ ADDITIONAL_DEPS ?=
 
 .PHONY: build
 build: $(LIB)
-	$(PYTHON) setup.py bdist_wheel
+	$(PYTHON) setup.py bdist_wheel --universal
 	@printf "\033[0;32mPIP package built\033[0m: "
 	@ls dist/*.whl
 
