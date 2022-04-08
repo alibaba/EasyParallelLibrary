@@ -63,17 +63,14 @@ def apply_accmulation(optimizer, apply_gradients_fn,
   tf_logging.info("Enable gradient accumulation, num_micro_batch: {}".format(niter))
   mean_grad_flag = True if Env.get().config.communication.gradients_reduce_method == \
                            constant.REDUCE_METHOD_MEAN else False
-  data = []
-  grads = []
+  grads_and_vars = []
   for g, v in slots_and_vars:
     with ops.device(g.device):
       g = array_ops.identity(g, name='acc_grads_tensor')
       if mean_grad_flag:
         g = g / niter
-    grads.append(g)
-    data.append((g, v))
-  grads_and_vars = data
-  Graph.get().gradients += grads
+    grads_and_vars.append((g, v))
+  Graph.get().add_grads_and_vars(grads_and_vars)
   update_ops = []
   apply_op = apply_grad_group(optimizer, apply_gradients_fn, grads_and_vars,
                               ngroup, global_step, "epl_apply_grad_ga")

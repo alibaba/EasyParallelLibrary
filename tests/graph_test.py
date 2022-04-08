@@ -221,10 +221,10 @@ class GraphTest(test.TestCase):
         self.assertEqual(0, len(w))
         with warnings.catch_warnings(record=True) as w:
           gvs = optimizer.compute_gradients(loss)
-        self.assertEqual(1, len(w))
+        self.assertEqual(0, len(w))
         with warnings.catch_warnings(record=True) as w:
           optimizer.apply_gradients(gvs)
-        self.assertEqual(1, len(w))
+        self.assertEqual(0, len(w))
 
       x3 = tf.constant(1.1, shape=[2, 2])
       self.assertEqual(Graph.get()._user_default_taskgraph, None)

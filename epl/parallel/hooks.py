@@ -124,10 +124,6 @@ def gradients_impl_gradients_helper(fn):
   def gradient_helper(*args, **kwargs):
     """Check is epl context empty before gradients function. Clear
     epl context after gradeints function. Get gradients results."""
-    if Env.get().strategy_context:
-      warnings.warn("EPL ignores the context of backward operations, "
-                    "as it collocates the backward operations with their "
-                    "corresponding forward operations automatically.")
 
     config = Env.get().config
     if config.auto.auto_parallel:
@@ -176,7 +172,8 @@ def gradients_impl_gradients_helper(fn):
     if Env.get().config.communication.clip_after_allreduce:
       if not ga_enabled():
         warnings.warn("Clip gradients by norm after allreduce is enabled.")
-        Graph.get().gradients = gradients
+        variables = args[1]
+        Graph.get().add_grads_and_vars(list(zip(gradients, variables)))
       else:
         warnings.warn("Gradient accumulation does not support opt_clip_after_allreduce by now, ignore it.")
     return gradients
@@ -188,18 +185,15 @@ def optimizer_apply_gradients(fn):
   """Hook apply function to get apply operations."""
   def apply_gradients(self, grads_and_vars, *args, **kwargs):
     """Get apply operations by set model phase to APPLY."""
-    if Env.get().strategy_context:
-      warnings.warn("EPL ignores the context of apply operations, "
-                    "as it collocates the apply operations with their "
-                    "corresponding forward operations automatically.")
-
+    # Convert to list for py3
+    if not isinstance(grads_and_vars, list):
+      grads_and_vars = list(grads_and_vars)
     num_apply_group = Env.get().config.optimizer.num_apply_group
-
+    # apply optimizations only if all variables are not updated before.
+    apply_opt = all(v not in Graph.get().variables for g, v in grads_and_vars)
     if not Env.get().config.communication.clip_after_allreduce:
-      # TODO(jiangle.jl): Suppoort multi-optimizers.
       if not ga_enabled():
-        Graph.get().gradients += [gv[0] for gv in grads_and_vars]
-
+        Graph.get().add_grads_and_vars(grads_and_vars)
 
     global_step = None
     name = None
@@ -214,8 +208,9 @@ def optimizer_apply_gradients(fn):
     ga_iters = ga_iter_num()
 
     with ModelPhase(ModelPhase.APPLY):
-      apply_fn = None
-      if zero_enabled():
+      if not apply_opt:
+        apply_fn = lambda: fn(self, grads_and_vars, *args, **kwargs)
+      elif zero_enabled():
         apply_fn = lambda: apply_zero(self, fn, grads_and_vars,
                                       global_step, ga_iters,
                                       num_apply_group, name)
@@ -230,7 +225,7 @@ def optimizer_apply_gradients(fn):
       else:
         apply_fn = lambda: fn(self, grads_and_vars, *args, **kwargs)
 
-      if amp_enabled() and Env.get().config.amp.loss_scale == "dynamic":
+      if apply_opt and amp_enabled() and Env.get().config.amp.loss_scale == "dynamic":
         return amp_update(grads_and_vars, apply_fn, name)
       return apply_fn()
   return apply_gradients

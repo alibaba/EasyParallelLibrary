@@ -27,7 +27,7 @@ from test_utils import fix_randomness
 
 # pylint: disable=missing-docstring,unused-variable
 # pylint: disable=protected-access
-class GradientAccumulationTest(test.TestCase):
+class OptimizerHelperTest(test.TestCase):
 
   @classmethod
   def setUpClass(cls): # pylint: disable=invalid-name
