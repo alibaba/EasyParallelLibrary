@@ -28,6 +28,8 @@ from epl.ir.graph import ModelPhase
 from epl.parallel.ops import node_clone_for_amp
 from epl.parallel.ops import Colocate
 from epl.utils import constant
+from epl.utils.common import in_while_loop
+
 
 # Numerically-safe (for execution in fp16), always converted as fp16.
 allow_list = ["BlockLSTM", "BlockLSTMV2", "BlockLSTMGrad", "BlockLSTMGradV2",
@@ -196,6 +198,7 @@ class AMP(object):
     ops = [op for op in ops if get_phase(op) in \
            [ModelPhase.FORWARD, ModelPhase.BACKWARD]]
     filter_ops = [op for op in ops if op.type not in preserve_list]
+    filter_ops = [op for op in ops if not in_while_loop(op)]
     self.should_process_ops = set(filter_ops)
     return ops
 

@@ -30,6 +30,7 @@ from tensorflow.python.platform import test
 import epl
 from epl.utils import constant
 from test_utils import fix_randomness
+from test_utils import input_to_tensorarray
 
 
 # pylint: disable=missing-docstring,unused-variable
@@ -213,8 +214,8 @@ class AmpTest(test.TestCase):
       with self.create_session() as sess:
         gc_tensors = sorted([t.name for t in epl.Graph.get().gc_tensors])
         self.assertEqual(len(gc_tensors), 6)
-        expected_names = ['s1/s2/s3/s4_layer{}/clip_by_norm_4:0'.format(i) for i in range(5)]
-        expected_names = ['IteratorGetNext:0'] + expected_names
+        expected_names = ['s1/s2/s3/s4_layer{}/clip_by_norm_4_{}:0'.format(i, "EPL_AMP_float16") for i in range(5)]
+        expected_names = ['IteratorGetNext_EPL_AMP_cast_float16:0'] + expected_names
         self.assertEqual(gc_tensors, expected_names)
         while not sess.should_stop():
           if collect:
@@ -256,6 +257,66 @@ class AmpTest(test.TestCase):
     train_opts = opt.minimize(loss, global_step=global_step, name='train')
     with tf.train.MonitoredTrainingSession() as sess:
       sess.run(train_opts)
+
+  def _model_def_while_loop(self):
+    fix_randomness()
+    num_x = np.random.randint(0, 1, (500, 1, 1)).astype(dtype=np.float32)
+    num_y = np.random.randint(0, 1, 500).astype(dtype=np.int32)
+    seq_len = 1
+    hidden_dim = 1
+    dataset = tf.data.Dataset.from_tensor_slices((num_x, num_y)) \
+        .batch(1).repeat(1)
+    iterator = dataset.make_initializable_iterator()
+    tf.add_to_collection(tf.GraphKeys.TABLE_INITIALIZERS,
+                         iterator.initializer)
+    x, y = iterator.get_next()
+    u = tf.get_variable(name='U', shape=[1, hidden_dim], dtype=tf.float32)
+    b_u = tf.get_variable(name='b_U', shape=[hidden_dim], dtype=tf.float32)
+
+    v = tf.get_variable(name='V', shape=[hidden_dim, 1], dtype=tf.float32)
+    b_v = tf.get_variable(name='b_V', shape=[1], dtype=tf.float32)
+
+    w = tf.get_variable(name='W', shape=[hidden_dim, hidden_dim], \
+                        dtype=tf.float32)
+    b_w = tf.get_variable(name='b_W', shape=[hidden_dim], dtype=tf.float32)
+    input_ta = input_to_tensorarray(x, 1, seq_len)
+    h = tf.TensorArray(tf.float32, seq_len+1, clear_after_read=False)
+    h = h.write(0, tf.constant(np.zeros((1, hidden_dim)), dtype=tf.float32))
+    output = tf.TensorArray(tf.float32, seq_len)
+    time = tf.constant(0, dtype=tf.int32)
+
+    def loop_body(time, hidden, output):
+      input_step = input_ta.read(time)
+      h_prev = hidden.read(time)
+      hidden = hidden.write(time + 1, tf.tanh(tf.matmul(input_step, u) + \
+                            b_u + tf.matmul(h_prev, w) + b_w))
+      output = output.write(time, tf.matmul(hidden.read(time + 1), v) + b_v)
+      return (time + 1, hidden, output)
+    # build graph using while_loop
+    loop_cond_fn = lambda time, _1, _2: time < seq_len
+    final_state_ = tf.while_loop(cond=loop_cond_fn, body=loop_body, \
+                                 loop_vars=(time, h, output), \
+                                 back_prop=False)
+
+    final_state = final_state_
+    final_output = final_state[-1].read(seq_len-1)
+    for i in range(10):
+      final_output = tf.layers.dense(inputs=final_output, units=16)
+    final_output = tf.layers.dense(inputs=final_output, units=1)
+    loss = tf.nn.softmax_cross_entropy_with_logits(
+        labels=y, logits=tf.reshape(final_output, shape=[1]))
+    return tf.reduce_mean(loss)
+
+  def test_while_loop(self):
+    config = epl.Config({"amp.level": "o1", "loss_scale": 128})
+    epl.init(config)
+    epl.set_default_strategy(epl.replicate(1))
+    loss = self._model_def_while_loop()
+    optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
+    opt = optimizer.minimize(loss)
+    with tf.train.MonitoredTrainingSession() as sess:
+      for i in range(3):
+        l, _ = sess.run([loss, opt])
 
 # pylint: enable=missing-docstring,unused-variable
 # pylint: enable=protected-access

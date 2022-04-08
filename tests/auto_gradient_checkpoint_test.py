@@ -27,27 +27,10 @@ from epl.config import Config
 from epl.runtime.gc.auto_gradient_checkpoint import get_entrance_exits_tensors, \
         filter_ops
 from test_utils import fix_randomness
-
+from test_utils import input_to_tensorarray
 
 # pylint: disable=missing-docstring,unused-variable
 # pylint: disable=protected-access
-def input_to_tensorarray(value, axis, size=None):
-  shape = value.get_shape().as_list()
-  rank = len(shape)
-  dtype = value.dtype
-  array_size = shape[axis] if not shape[axis] is None else size
-
-  if array_size is None:
-    raise ValueError("Can't create TensorArray with size None")
-
-  array = tf.TensorArray(dtype=dtype, size=array_size)
-  dim_permutation = [axis] + list(range(1, axis)) + [0] + \
-      list(range(axis + 1, rank))
-  unpack_axis_major_value = tf.transpose(value, dim_permutation)
-  full_array = array.unstack(unpack_axis_major_value)
-  return full_array
-
-
 class AutoGCTest(test.TestCase):
   def _model_def(self):
     with epl.replicate(device_count=1):
