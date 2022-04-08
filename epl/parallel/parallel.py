@@ -212,6 +212,9 @@ class Parallel(object):
     """Tranform original graph to parallel graph."""
     if self._graph.is_constructor:
       with ops.name_scope(constant.PARALLEL_STRATEGY):
+        for op in self._graph.dataset_api_op:
+          if op.type in constant.ODPS_TABLE_API_OPS:
+            self._graph.check_and_set_cloned_dataset_need_clone()
         self._fix_map_operations_to_taskgraph()
         if Env.get().config.offload.level == "v0":
           tf_logging.info("enable weight offload")

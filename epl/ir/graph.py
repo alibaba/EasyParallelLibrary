@@ -536,8 +536,6 @@ class Graph(object):
     # Specific dataset api op.
     if op.type in constant.DATASET_API_OPS:
       self._dataset_api_op.append(op)
-      if op.type in constant.ODPS_TABLE_API_OPS:
-        self.check_and_set_cloned_dataset_need_clone()
 
     if current_model_phase == ModelPhase.ADD_FUNCTION:
       if not self._current_function_name:
