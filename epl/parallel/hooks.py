@@ -142,6 +142,8 @@ def gradients_impl_gradients_helper(fn):
       loss = scale_loss(args[0], scale)
       args = (loss,) + args[1:]
     Parallel.get().device_replacement()
+    if amp_enabled():
+      AMP().convert()
     # EPL should place the computation of gradients on the same
     # device as the original (forward-pass) op. Tensorflow of version 1.15 has
     # parameter unconnected_gradients which not exist in tensorflow 1.12. To
@@ -168,7 +170,6 @@ def gradients_impl_gradients_helper(fn):
               gradients[index] = ops.convert_to_tensor(grad)
 
     if amp_enabled():
-      AMP().convert()
       with ModelPhase(ModelPhase.BACKWARD):
         with ops.name_scope(constant.LOSS_SCALE_SCOPE_NAME):
           gradients = unscale_grads(gradients, scale)

@@ -31,3 +31,20 @@ def fix_randomness():
   random.seed(seed)
   np.random.seed(seed)
   tf.set_random_seed(seed)
+
+def input_to_tensorarray(value, axis, size=None):
+  """create input to tensorarray for while_loop."""
+  shape = value.get_shape().as_list()
+  rank = len(shape)
+  dtype = value.dtype
+  array_size = shape[axis] if not shape[axis] is None else size
+
+  if array_size is None:
+    raise ValueError("Can't create TensorArray with size None")
+
+  array = tf.TensorArray(dtype=dtype, size=array_size)
+  dim_permutation = [axis] + list(range(1, axis)) + [0] + \
+      list(range(axis + 1, rank))
+  unpack_axis_major_value = tf.transpose(value, dim_permutation)
+  full_array = array.unstack(unpack_axis_major_value)
+  return full_array
