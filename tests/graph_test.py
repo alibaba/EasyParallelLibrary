@@ -774,6 +774,27 @@ class GraphTest(test.TestCase):
         steps.append(step)
     self.assertEqual(steps, [0, 1, 2])
 
+  def test_check_and_set_cloned_dataset_need_clone(self):
+    epl.init()
+    epl.set_default_strategy(epl.replicate(1))
+    num_x = np.random.randint(0, 10, (500, 10)).astype(dtype=np.float32)
+    num_y = np.random.randint(0, 10, 500).astype(dtype=np.int32)
+    dataset = tf.data.Dataset.from_tensor_slices((num_x, num_y)) \
+        .batch(2).repeat(1)
+    iterator = dataset.make_initializable_iterator()
+    tf.add_to_collection(tf.GraphKeys.TABLE_INITIALIZERS, iterator.initializer)
+    source, target = iterator.get_next()
+    x = tf.layers.dense(inputs=source, units=16, activation=None)
+    x = tf.layers.dense(inputs=x, units=16, activation=None)
+    dense1 = tf.layers.dense(inputs=x, units=16, activation=None)
+    logits = tf.layers.dense(inputs=dense1, units=10, activation=None)
+    loss = tf.reduce_mean(logits)
+    global_step = tf.train.get_or_create_global_step()
+    optimizer = tf.train.MomentumOptimizer(learning_rate=0.001, momentum=0.9)
+    train_op = optimizer.minimize(loss, global_step=global_step)
+    epl.Graph.get().check_and_set_cloned_dataset_need_clone()
+
+
 
 # pylint: enable=missing-docstring,protected-access,unused-argument,
 # pylint: enable=line-too-long,bad-continuation,unused-variable

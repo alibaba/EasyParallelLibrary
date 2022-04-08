@@ -280,7 +280,7 @@ class Graph(object):
       self.clone_dataset_related_ops = True
       return
     constructor_num_device = dict()
-    for devices in self._env.cluster.virtual_devices[0]:
+    for devices in self._env.cluster.virtual_devices[0].slice_devices:
       for device in devices:
         constructor_task_index = \
             common.get_task_index_from_device_str(device)
