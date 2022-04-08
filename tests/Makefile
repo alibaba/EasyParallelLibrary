@@ -14,6 +14,7 @@ test:
 	CUDA_VISIBLE_DEVICES=$(GPU_4) ./launch.sh auto_cluster_test.py
 	CUDA_VISIBLE_DEVICES=$(GPU_2) ./launch.sh estimator_test.py
 	CUDA_VISIBLE_DEVICES=$(GPU_2) ./launch.sh estimator_loss_test.py
+	CUDA_VISIBLE_DEVICES=$(GPU_2) ./launch.sh multi_optimizer_test.py
 	CUDA_VISIBLE_DEVICES=$(GPU_2) ./launch.sh optimizer_helper_test.py
 	CUDA_VISIBLE_DEVICES='' ./launch.sh initializers_test.py
 	CUDA_VISIBLE_DEVICES='' ./launch.sh phase_test.py

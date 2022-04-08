@@ -93,8 +93,8 @@ class Graph(object):
     self._vars_related_op_names = None
     self._dataset_related_ops = None
     self._clone_dataset_related_ops = False
-    # TODO(jiangle.jl): Support multi-optimizer.
     self._gradients = []
+    self._variables = []
     self.primitive_init_op = None
     # TODO(jiangle.jl): Support train_and_evaluate.
     self._dataset_api_op = []
@@ -232,13 +232,20 @@ class Graph(object):
     """Number of constructors defined in epl.Cluster."""
     return len(self.constructor_task)
 
+  def add_grads_and_vars(self, grads_and_vars):
+    """Add gradients for parallelism. For each variable, only add corresponding grad once."""
+    for grad, var in grads_and_vars:
+      if var not in self._variables:
+        self._variables.append(var)
+        self._gradients.append(grad)
+
   @property
   def gradients(self):
     return self._gradients
 
-  @gradients.setter
-  def gradients(self, gradients):
-    self._gradients = gradients
+  @property
+  def variables(self):
+    return self._variables
 
   @property
   def dataset_api_op(self):
