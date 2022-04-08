@@ -146,17 +146,17 @@ def get_run_script(args):
   for index in range(args.num_workers-1, -1, -1):
     if args.machine_rank != None and args.machine_rank != index:
       continue
-    output_dir = os.path.join(output_dir, str(index))
-    if not os.path.exists(output_dir):
-      os.makedirs(output_dir)
-    script += "export GPU_STATUS_FILE={}/GPU_STATUS_{}.json\n".format(output_dir, index)
+    task_dir = os.path.join(output_dir, str(index))
+    if not os.path.exists(task_dir):
+      os.makedirs(task_dir)
+    script += "export GPU_STATUS_FILE={}/GPU_STATUS_{}.json\n".format(task_dir, index)
     script += get_tf_config(args.num_workers, index, ports, args.machine_list)
     script += ' CUDA_VISIBLE_DEVICES=' + get_visible_devices(args.gpu_per_worker, offset)
-    script += ' bash {}'.format(args.training_script) + ' ' + output_dir
+    script += ' bash {}'.format(args.training_script) + ' ' + task_dir
     if args.debug and index == 0:
       print("Enable debug mode")
     else:
-      log_file = '{}/stderr_{}.log'.format(output_dir, index)
+      log_file = '{}/stderr_{}.log'.format(task_dir, index)
       script += '> {} 2>&1&'.format(log_file)
       script += "\necho [task_index: {}] log file: {}".format(index, log_file)
     script += '\n'
