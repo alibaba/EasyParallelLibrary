@@ -80,6 +80,11 @@ class VirtualDevice(object):
     """
     return self._slice_devices[replica_idx][device_idx]
 
+  @property
+  def slice_devices(self):
+    """Get device slices"""
+    return self._slice_devices
+
   def _device_in_local_worker(self, device):
     return common.get_task_index_from_device_str(device) == self._worker_index
 

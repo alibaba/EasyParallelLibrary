@@ -280,7 +280,7 @@ class Graph(object):
       self.clone_dataset_related_ops = True
       return
     constructor_num_device = dict()
-    for devices in self._env.cluster.virtual_devices[0]:
+    for devices in self._env.cluster.virtual_devices[0].slice_devices:
       for device in devices:
         constructor_task_index = \
             common.get_task_index_from_device_str(device)
@@ -536,8 +536,6 @@ class Graph(object):
     # Specific dataset api op.
     if op.type in constant.DATASET_API_OPS:
       self._dataset_api_op.append(op)
-      if op.type in constant.ODPS_TABLE_API_OPS:
-        self.check_and_set_cloned_dataset_need_clone()
 
     if current_model_phase == ModelPhase.ADD_FUNCTION:
       if not self._current_function_name:
