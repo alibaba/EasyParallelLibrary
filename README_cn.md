@@ -63,13 +63,17 @@ EPL助力了最大的中文多模态模型M6实现大规模分布式训练，通
 ## Citation
 
 ```latex
-@misc{jia2021whale,
-      title={Whale: Scaling Deep Learning Model Training to the Trillions}, 
-      author={Xianyan Jia and Le Jiang and Ang Wang and Jie Zhang and Xinyuan Li and Wencong Xiao and Langshi chen and Yong Li and Zhen Zheng and Xiaoyong Liu and Wei Lin},
-      year={2021},
-      eprint={2011.09208},
-      archivePrefix={arXiv},
-      primaryClass={cs.DC}
+@inproceedings {jia2022whale,
+	author = {Xianyan Jia and Le Jiang and Ang Wang and Wencong Xiao and Ziji Shi and Jie Zhang and Xinyuan Li and Langshi Chen and Yong Li and Zhen Zheng and Xiaoyong Liu and Wei Lin},
+	title = {Whale: Efficient Giant Model Training over Heterogeneous {GPUs}},
+	booktitle = {2022 USENIX Annual Technical Conference (USENIX ATC 22)},
+	year = {2022},
+	isbn = {978-1-939133-29-57},
+	address = {Carlsbad, CA},
+	pages = {673--688},
+	url = {https://www.usenix.org/conference/atc22/presentation/jia-xianyan},
+	publisher = {USENIX Association},
+	month = jul,
 }
 ```
 
