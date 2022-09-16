@@ -33,6 +33,9 @@ from epl.env import Env
 from epl.ir.graph import Graph
 from epl.runtime.optimizer_helper import filter_none_grads, \
   apply_grad_group
+from epl.runtime.amp.loss_scale import amp_update
+from epl.runtime.amp.auto_mixed_precision import amp_enabled
+
 
 def ga_iter_num():
   """Return gradient accumulation iteration number."""
@@ -72,8 +75,12 @@ def apply_accmulation(optimizer, apply_gradients_fn,
     grads_and_vars.append((g, v))
   Graph.get().add_grads_and_vars(grads_and_vars)
   update_ops = []
-  apply_op = apply_grad_group(optimizer, apply_gradients_fn, grads_and_vars,
-                              ngroup, global_step, "epl_apply_grad_ga")
+  apply_fn = lambda: apply_grad_group(optimizer, apply_gradients_fn, grads_and_vars,
+                                      ngroup, global_step, "epl_apply_grad_ga")
+  if amp_enabled() and Env.get().config.amp.loss_scale == "dynamic":
+    apply_op = amp_update(grads_and_vars, apply_fn, 'amp_update')
+  else:
+    apply_op = apply_fn()
   update_ops.append(apply_op)
   with ops.control_dependencies(update_ops):
     clear_ops = [state_ops.assign(s, array_ops.zeros_like(s)) for s in slots]

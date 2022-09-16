@@ -23,11 +23,19 @@ import numpy as np
 import tensorflow as tf
 import epl
 
+tf.logging.set_verbosity(tf.logging.INFO)
 flags = tf.app.flags
 flags.DEFINE_integer("max_steps", 10, "max training step")
+flags.DEFINE_float("learning_rate", 0.001, "learning_rate")
+flags.DEFINE_integer("num_micro_batch", 1, "num_micro_batch")
+flags.DEFINE_string("amp", None, "amp")
 FLAGS = tf.app.flags.FLAGS
-
-epl.init()
+config_json = {}
+if FLAGS.amp:
+  config_json["amp.level"] = "o1"
+  config_json["amp.loss_scale"] = float(FLAGS.amp) if FLAGS.amp != "dynamic" else "dynamic"
+  config_json["pipeline.num_micro_batch"] = FLAGS.num_micro_batch
+epl.init(epl.Config(config_json))
 epl.set_default_strategy(epl.replicate(1))
 
 # dataset
@@ -43,12 +51,26 @@ logits = tf.layers.dense(logits, 10)
 loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
 
 global_step = tf.train.get_or_create_global_step()
-optimizer = tf.train.MomentumOptimizer(learning_rate=0.001, momentum=0.9)
+optimizer = tf.train.MomentumOptimizer(FLAGS.learning_rate, momentum=0.9)
 train_op = optimizer.minimize(loss, global_step=global_step)
 
 hooks = [tf.train.StopAtStepHook(last_step=FLAGS.max_steps)]
+max_steps = (FLAGS.max_steps+1) * FLAGS.num_micro_batch
+cum_steps = 0
 with tf.train.MonitoredTrainingSession(hooks=hooks) as sess:
-  while not sess.should_stop():
-    train_loss, _, step = sess.run([loss, train_op, global_step])
-    print("Iteration %s , Loss: %s ." % (step, train_loss))
+  while not sess.should_stop() or cum_steps > max_steps:
+    train_ops = [loss, train_op, global_step]
+    if FLAGS.amp:
+      train_ops.append(epl.Env.get().parallel_information["AMP_LOSS_SCALE"]._num_good_steps) # pylint: disable=protected-access
+      train_ops.append(epl.Env.get().parallel_information["AMP_LOSS_SCALE"]._current_loss_scale) # pylint: disable=protected-access
+    res = sess.run(train_ops)
+    print("Iteration %s , Loss: %s ." % (res[2], res[0]))
+    if FLAGS.amp:
+      num_good_steps = res[3]
+      current_loss_scale = res[4]
+      if FLAGS.learning_rate >= 100:
+        assert num_good_steps <= 1
+        assert res[2] <= 1
+      print('good_steps: {}, current_loss_scale: {}'.format(num_good_steps, current_loss_scale))
+    cum_steps += 1
 print("Train Finished.")
