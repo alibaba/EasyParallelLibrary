@@ -117,7 +117,7 @@ class GraphEditor(object):
     """Slicing table to balance data load among all model replicas."""
     slice_id = 0
     all_devices = dataset_api_op.taskgraph.virtual_device.all_devices
-    list.sort(all_devices)
+    all_devices = sorted(all_devices)
     if self._graph.num_constructors > 1:
       total_num_slices = len(all_devices)
       for idx, dev in enumerate(all_devices):

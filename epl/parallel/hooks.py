@@ -210,23 +210,25 @@ def optimizer_apply_gradients(fn):
     with ModelPhase(ModelPhase.APPLY):
       if not apply_opt:
         apply_fn = lambda: fn(self, grads_and_vars, *args, **kwargs)
-      elif zero_enabled():
-        apply_fn = lambda: apply_zero(self, fn, grads_and_vars,
-                                      global_step, ga_iters,
-                                      num_apply_group, name)
       elif ga_enabled():
         apply_fn = lambda: apply_ga(self, fn, grads_and_vars,
                                     global_step, ga_iters,
                                     num_apply_group, name)
-      elif num_apply_group > 1:
-        apply_fn = lambda: apply_grad_group(self, fn, grads_and_vars,
-                                            num_apply_group,
-                                            global_step, name=name)
       else:
-        apply_fn = lambda: fn(self, grads_and_vars, *args, **kwargs)
+        if zero_enabled():
+          apply_fn = lambda: apply_zero(self, fn, grads_and_vars,
+                                        global_step, ga_iters,
+                                        num_apply_group, name)
 
-      if apply_opt and amp_enabled() and Env.get().config.amp.loss_scale == "dynamic":
-        return amp_update(grads_and_vars, apply_fn, name)
+        elif num_apply_group > 1:
+          apply_fn = lambda: apply_grad_group(self, fn, grads_and_vars,
+                                              num_apply_group,
+                                              global_step, name=name)
+        else:
+          apply_fn = lambda: fn(self, grads_and_vars, *args, **kwargs)
+
+        if amp_enabled() and Env.get().config.amp.loss_scale == "dynamic":
+          return amp_update(grads_and_vars, apply_fn, name)
       return apply_fn()
   return apply_gradients
 
@@ -578,7 +580,8 @@ def saver_restore(fn):
     # TODO(wangang.wa): This code will be removed after merging
     # variables for split strategy.
     if Graph.get().first_constructor_rank == Env.get().cluster.worker_index or \
-        any(taskgraph.strategy_context.split_strategy is not None for taskgraph in Graph.get().taskgraphs):
+        any(taskgraph.strategy_context.split_strategy is not None for taskgraph in Graph.get().taskgraphs) or \
+        not Graph.get().need_parallel:
       with ModelPhase(ModelPhase.SAVE_AND_RESTORE):
         ret = fn(self, sess, save_path)
     return ret
