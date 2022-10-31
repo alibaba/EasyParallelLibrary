@@ -152,7 +152,8 @@ def get_run_script(args):
     script += "export GPU_STATUS_FILE={}/GPU_STATUS_{}.json\n".format(task_dir, index)
     script += get_tf_config(args.num_workers, index, ports, args.machine_list)
     script += ' CUDA_VISIBLE_DEVICES=' + get_visible_devices(args.gpu_per_worker, offset)
-    script += ' bash {}'.format(args.training_script) + ' ' + task_dir
+    cmd = 'python' if args.training_script.endswith('.py') else 'bash'
+    script += ' {} {}'.format(cmd, args.training_script) + ' ' + task_dir
     if args.debug and index == 0:
       print("Enable debug mode")
     else:
