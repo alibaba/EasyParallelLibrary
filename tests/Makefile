@@ -11,6 +11,7 @@ test:
 	CUDA_VISIBLE_DEVICES='' ./launch.sh header_test.py
 	PYTHONPATH=../ $(PYTHON) -m epl.utils.launcher --num_workers=2 --gpu_per_worker=1 --debug=True test_launcher.sh
 	PYTHONPATH=../ $(PYTHON) -m epl.utils.launcher --num_workers=2 --gpu_per_worker=1 --debug=True test_amp_parallel.sh
+	CUDA_VISIBLE_DEVICES=$(GPU_1) ./launch.sh eager_test.py
 	CUDA_VISIBLE_DEVICES=$(GPU_4) ./launch.sh strategy_new_test.py
 	CUDA_VISIBLE_DEVICES=$(GPU_4) ./launch.sh auto_cluster_test.py
 	CUDA_VISIBLE_DEVICES=$(GPU_2) ./launch.sh estimator_test.py

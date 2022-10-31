@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from tensorflow.python.eager.context import executing_eagerly
+
 from epl.cluster import Cluster
 from epl.env import Env
 from epl.config import Config
@@ -35,6 +37,9 @@ from epl.utils.version import VERSION
 
 def init(config=None):
   """Init EPL."""
+  if executing_eagerly():
+    raise RuntimeError("Tensorflow eager mode is not supported by EPL now, " + \
+                       "please do not call tf.enable_eager_execution()")
   env = Env.get()
   env.reset()
   env.init(config)

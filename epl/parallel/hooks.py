@@ -39,6 +39,7 @@ from tensorflow.python.client import session
 from tensorflow.python.estimator import estimator
 from tensorflow.python.estimator import run_config
 from tensorflow.python.estimator import training
+from tensorflow.python.estimator.model_fn import ModeKeys
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import device as pydev
 from tensorflow.python.framework import dtypes
@@ -913,17 +914,23 @@ def estimator_call_model_fn(call_fn):
 
 def _sync_signal():
   """Sync a tensor among constructor workers."""
-  all_devices = Env.get().cluster.virtual_devices[0].all_devices
-  all_devices = [device for device in all_devices if 'GPU:0' in device]
+  vd = Env.get().cluster.virtual_devices[0]
+  all_devices = vd.all_devices
+  local_devices = vd.local_devices
   if len(all_devices) <= 1:
     return
+
   with ops.Graph().as_default():
-    signal = constant_op.constant([1])
-    with ops.device(Env.get().cluster.current_worker_chief_gpu()):
-      comm = create_serial_communicator(name="BROADCAST_SIGNAL", devices=all_devices)
-      sync_tensor = comm.broadcast([signal])
-    with monitored_session.MonitoredTrainingSession() as sess:
-      sess.run(sync_tensor)
+    sync_ops = []
+    comm = create_serial_communicator(name="BROADCAST_SIGNAL", devices=all_devices)
+    for local_device in local_devices:
+      with ops.device(local_device):
+        signal = constant_op.constant([1])
+        Graph.get().set_model_mode(ModeKeys.EVAL)
+        sync_tensor = comm.broadcast([signal])
+        sync_ops.append(sync_tensor)
+    with session.Session() as sess:
+      sess.run(sync_ops)
 
 
 def estimator_training_evaluate_hook():
