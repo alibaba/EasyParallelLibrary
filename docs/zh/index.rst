@@ -21,6 +21,7 @@ EPL (Easy Parallel Library) 是一个高效易用的分布式大模型训练框�
    api/strategy
    api/api_examples
    api/config
+   api/env
 
 |
 |
